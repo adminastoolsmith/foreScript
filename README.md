@@ -22,5 +22,3 @@ forScript supports:
 2) WOL - This works by retrieving MAC addresses from a DHCP server and send out WOL packets for each MAC address
 3) The ability to run Powershell scripts in batches using a CSV file as input
 4) Dispalying the results of the Powershell script as an HTML report
-
-
