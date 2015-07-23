@@ -1,0 +1,149 @@
+﻿<Window 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ForeScript" MinHeight="670" MinWidth="1165" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <!-- Console Output menu -->
+        <ContextMenu x:Key="ConsoleOutputContextMenu">
+            <MenuItem Header="Clear Console..." Name="ClearConsoleMenu"/>
+        </ContextMenu>
+        <!-- Tabitem menu -->
+        <ContextMenu x:Key="TabitemContextMenu">
+            <MenuItem Header="Close Tab" Name="CloseTabMenu"/>
+            <MenuItem Header="Close All Tabs" Name="CloseAllTabsMenu"/>
+            <MenuItem Header="Save" Name="SaveTabContentsMenu"/>
+        </ContextMenu>
+        <ContextMenu x:Key="DHCPContextMenu">
+            <MenuItem Header="Close Tab" Name="DHCPCloseTabMenu"/>
+            <MenuItem Header="Close All Tabs" Name="DHCPCloseAllTabsMenu"/>
+        </ContextMenu>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26*" />
+            <RowDefinition Height="66*" />
+            <RowDefinition Height="8*" />
+        </Grid.RowDefinitions>
+        <GroupBox Header="Please provide either the path to a file or the name or ip address of a DHCP server. Note that DHCP Server is also WOL Server." Grid.Row="0" HorizontalAlignment="Stretch" Margin="10,0,10,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70*" />
+                    <ColumnDefinition Width="30*" />
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Row="0" Grid.Column="0" Margin="10,5,10,0">
+                    <GroupBox.Header>
+                            <RadioButton Name="ImportFromFileRadioButton" Content="Import computers from File :" GroupName="Import" IsChecked="True"/>
+                        </GroupBox.Header>
+                        <StackPanel HorizontalAlignment="Stretch"  Orientation="Horizontal" IsEnabled="{Binding ElementName=ImportFromFileRadioButton, Path=IsChecked}" >
+                            <TextBox Name="SelectFileTextBox" Height="25" Width="550" Margin="10,0,10,0"/>
+                            <Button Name="SelectFileButton" Content="Select File ..."  Height="25" Width="100" Margin="10,10,10,10"/>
+                        </StackPanel>
+                    </GroupBox>
+                <GroupBox Grid.Row="1" Grid.Column="0"  Margin="10,5,10,0">
+                        <GroupBox.Header>
+                            <RadioButton Name="ImportFromDHCPRadioButton" Content="Import computers from DHCP :" GroupName="Import"/>
+                        </GroupBox.Header>
+                        <StackPanel HorizontalAlignment="Stretch"  Orientation="Horizontal"  IsEnabled="{Binding ElementName=ImportFromDHCPRadioButton, Path=IsChecked}">
+                            <Label Content="DHCP and WOL Server:" Height="25" Margin="10,0,10,0"/>
+                            <TextBox Name="DHCPServerTextBox" Height="25" Width="200" Margin="10,0,10,0"/>
+                            <Label Content="DHCP Subnet Scope:" Height="25" Margin="10,10,10,10"/>
+                            <TextBox Name="DHCPSubnetScopeTextBox" Height="25" Width="200"  Margin="10,0,10,0"/>
+                        </StackPanel>
+                    </GroupBox>
+                <GroupBox Grid.RowSpan="2" Grid.Column="1" Margin="10,5,10,0">
+                    <GroupBox.Header>
+                        <CheckBox Name="ProvideCredentialCheckBox" Content="Alternate login credentails [domain\username]"/>
+                    </GroupBox.Header>
+                    <StackPanel HorizontalAlignment="Stretch"  IsEnabled="{Binding ElementName=ProvideCredentialCheckBox, Path=IsChecked}">
+                        <Label Content="User Name:" Height="25" Margin="10,0,10,0"/>
+                        <TextBox Name="UserNameTextBox" Height="25" Width="200" Margin="10,0,10,0"/>
+                        <Label Content="Password:" Height="25" Margin="10,0,10,0"/>
+                        <PasswordBox Name="PasswordTextBox" Height="25" Width="200"  Margin="10,0,10,0" />
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+        <TabControl Name="MainDisplay"  Grid.Row="1" Margin="10,10,10,0" Background="#FFE5E5E5" >
+            <TabItem Header="Console Output" >
+                <RichTextBox Name="ConsoleOutputRichTextBox" ContextMenu="{StaticResource ConsoleOutputContextMenu}" Background="DarkBlue" Foreground="GhostWhite" FontFamily="Consolas" FontSize="14" IsReadOnly="True" VerticalScrollBarVisibility="Visible" AcceptsReturn="True" IsUndoEnabled="False" SpellCheck.IsEnabled="False" >
+                    <RichTextBox.CacheMode>
+                        <BitmapCache EnableClearType="False" RenderAtScale="1" SnapsToDevicePixels="False"  />
+                    </RichTextBox.CacheMode>
+                </RichTextBox>
+            </TabItem>
+            <TabItem  Header="Scripts">
+                <DataGrid Name="DisplayPSScripts" AutoGenerateColumns="False" ItemsSource="{Binding collectionview}"  CanUserAddRows="False" ColumnWidth="Auto" CanUserSortColumns="True" IsReadOnly="True">
+                    <DataGrid.GroupStyle>
+                        <!-- Style for groups at top level. -->
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Margin" Value="0,0,0,5"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                <Expander IsExpanded="True" Background="#FF112255" BorderBrush="#FF002255" Foreground="#FFEEEEEE" BorderThickness="1,1,1,5">
+                                                    <Expander.Header>
+                                                        <DockPanel>
+                                                            <TextBlock FontWeight="Bold" Text="{Binding Path=Name}" Margin="5,0,0,0" Width="100"/>
+                                                            <!--<TextBlock FontWeight="Bold" Text="{Binding Path=ItemCount}"/>-->
+                                                        </DockPanel>
+                                                    </Expander.Header>
+                                                    <Expander.Content>
+                                                        <ItemsPresenter />
+                                                    </Expander.Content>
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                        <!-- Style for groups under the top level. -->
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <DockPanel Background="LightBlue">
+                                        <TextBlock Text="{Binding Path=Name}" Foreground="Blue" Margin="30,0,0,0" Width="100"/>
+                                        <!--<TextBlock Text="{Binding Path=ItemCount}" Foreground="Blue"/>-->
+                                    </DockPanel>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </DataGrid.GroupStyle>
+                    <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Foreground" Value="Black" />
+                        <Setter Property="Background" Value="White" />
+                    </Style>
+                </DataGrid.RowStyle>
+                </DataGrid>
+            </TabItem>
+            <TabItem  Header="DHCP Leases">
+                <TabControl Name="DisplayDHCPLeases" Background="#FFE5E5E5" />
+            </TabItem>
+            <TabItem  Header="Results">
+                <TabControl Name="DisplayResults" Background="#FFE5E5E5" />
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="2" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="25*" />
+                <ColumnDefinition Width="75*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="10,10,10,10" >
+                <Button  Name="CancelButton" Content="Cancel" Height="25" Width="100" Margin="10,0,10,0" IsCancel="True" />
+                <Button  Name="DoWOLButton" Content="Wake On LAN" Height="25" Width="100" Margin="10,0,10,0"/>
+                <Button  Name="CancelScriptButton" Content="Cancel Script" Height="25" Width="100" Margin="10,0,10,0"/>
+                <Button  Name="BatchScriptButton" Content="Batch Script" Height="25" Width="100" Margin="10,0,10,0" />
+                <Button  Name="RunScriptButton" Content="Run Script" Height="25" Width="100" Margin="10,0,10,0" IsDefault="True"/>
+                <Button  Name="InvokeJSCallBackButton" Content="" IsEnabled="False" Height="25" Width="100" Margin="10,0,10,0" />
+            </StackPanel>
+            <CheckBox Grid.Column="0" Name="CombineResultsCheckbox" Content="Combine output of the script into one report" Height="25" Margin="10,0,10,0" IsChecked="True"/>
+        </Grid>
+    </Grid>
+</Window>

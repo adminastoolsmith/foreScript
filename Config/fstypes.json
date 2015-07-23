@@ -1,0 +1,6 @@
+{
+  "Types": [
+            { "name": "ForeScript.Types.ServerChecklist", "format": "ConvertTo-ServerChecklist", "display": "Out-ServerChecklist"  } ,
+            { "name": "ForeScript.Types.SQLServerData", "format": "ConvertTo-SQLServerChecklist", "display": "Out-SQLServerChecklist"  } 
+           ]
+}

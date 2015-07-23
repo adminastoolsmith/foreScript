@@ -1,0 +1,13 @@
+{
+  "Scripts": [
+            { "name": "Hard disk space usage", "author": "Nigel Thomas", "description": "This script is used to get the hard disk usage on computers.", "folder": "computer", "file": "Get-Diskspace.ps1", "authtype": "credential", "template": "FSHardDiskUsage.tpl", "callback" : "" } ,
+            { "name": "Ping Sweep", "author": "Nigel Thomas", "description": "This script is used to ping computers and return their status", "folder": "computer", "file": "Get-PingSweep.ps1", "authtype": "credential", "template": "FSWOL.tpl", "callback" : "" },
+            { "name": "Installed Product status", "author": "Nigel Thomas", "description": "This script is used to find out if a product is installed on a computer.", "folder": "computer", "file": "Get-InstalledProduct.ps1", "authtype": "credential", "template": "FSDefault.tpl", "callback" : "" },
+            { "name": "Server Checklist", "author": "Nigel Thomas", "description": "This script is used to automate daily checks of servers.", "folder": "checklist", "file": "Invoke-ServerCheckList.ps1", "authtype": "credential", "template": "FSServerChecklist.tpl", "callback" : "" },
+            { "name": "SQL Server Checklist", "author": "Nigel Thomas", "description": "This script is used to automate daily checks of database servers.", "folder": "checklist", "file": "Invoke-SQLServerCheckList.ps1", "authtype": "combined", "template": "FSSQLServerChecklist.tpl", "callback" : "" },
+            { "name": "SQL Server Blocked Processes", "author": "Nigel Thomas", "description": "This script is used to get blocked processes on SQL Server.", "folder": "database", "file": "Get-BlockedProcess.ps1", "authtype": "combined", "template": "FSSQLServerBlockedProcess.tpl", "callback" : "Kill SPID" },
+            { "name": "Antivirus Status", "author": "Nigel Thomas", "description": "This script is used to get Antivirus Product Information.", "folder": "security", "file": "Get-AntivirusProduct.ps1", "authtype": "credential", "template": "FSAntiVirusProduct.tpl", "callback" : "" },
+            { "name": "Reset Adminsitrator Password", "author": "Nigel Thomas", "description": "This script is used to reset the Local Administrator password.", "folder": "security", "file": "Set-AdminPassword.ps1", "authtype": "credential", "template": "FSDefault.tpl", "callback" : "" }
+           ]
+}
+
