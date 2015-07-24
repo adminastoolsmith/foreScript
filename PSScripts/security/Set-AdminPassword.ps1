@@ -20,14 +20,14 @@ if ($Computer -eq $null) {
     $Computer = $env:COMPUTERNAME
 }
 
-$PassedFormatFile = 'c:\psscripts\passwordformat.txt'
-if (Test-Path $PassedFormatFile) {
-    $Passwordformat = Get-Content -Path $PassedFormatFile -Raw
+$PasswdFormatFile = 'c:\psscripts\passwordformat.txt'
+if (Test-Path $PasswdFormatFile ) {
+    $Passwordformat = Get-Content -Path $PasswdFormatFile  -Raw
     #$Passwordformat
 }
 
 else {
-    $message = "Password formating file not found at $PassedFormatFile"
+    $message = "Password formating file not found at $PasswdFormatFile."
     $message
     return
 }
@@ -104,6 +104,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
                 'ComputerName' = $Computer
                 'FilterXml' = $query4724
                 'MaxEvents' = 1
+                'ErrorAction' = 'Stop'
             }
 
             if($FS_Credential) {
@@ -116,6 +117,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
                 'ComputerName' = $Computer
                 'FilterXml' = $query4738
                 'MaxEvents' = 1
+                'ErrorAction' = 'Stop'
             }
 
             if($FS_Credential) {
@@ -156,9 +158,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
 
      }
      catch {
-  
-       if ($_.Exception.InnerException) {            $ExceptionMessage = $_.Exception.InnerException | format-list -force       }       else {             $ExceptionMessage = $_.Exception | format-list -force       }       $ExceptionMessage 
-       
+         $ExceptionMessage = $_ | format-list -force       $ExceptionMessage 
      }
      
 

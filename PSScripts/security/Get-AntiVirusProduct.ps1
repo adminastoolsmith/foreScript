@@ -73,9 +73,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
 
      }
      catch {
-  
-       if ($_.Exception.InnerException) {            $ExceptionMessage = $_.Exception.InnerException       }       else {             $ExceptionMessage = $_.Exception.Message       }       $ExceptionMessage 
-       
+       $ExceptionMessage = $_ | format-list -force       $ExceptionMessage 
      }
      
 

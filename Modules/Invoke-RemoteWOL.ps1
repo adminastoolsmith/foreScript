@@ -247,7 +247,8 @@ try {
 
 }
 catch {
-    if ($_.Exception.InnerException) {        $ExceptionMessage = $_.Exception.InnerException    }    else {        $ExceptionMessage = $_.Exception.Message    }
+    
+    $ExceptionMessage = $_ | format-list -force
 
     $jsonresult = '{'
     $jsonresult += " 'Error' :"

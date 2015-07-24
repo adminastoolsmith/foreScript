@@ -280,9 +280,7 @@ namespace LOGIN_IMPERSONATION
         }
     }
     catch {
-        if ($_.Exception.InnerException) {                $ExceptionMessage = $_.Exception.InnerException            }            else {                $ExceptionMessage = $_.Exception.Message            }
-
-            $ExceptionMessage
+          $ExceptionMessage = $_ | format-list -force          $ExceptionMessage 
     }
 
 }
@@ -308,9 +306,7 @@ $DoCredential = {
 
     }
     catch {
-        if ($_.Exception.InnerException) {                $ExceptionMessage = $_.Exception.InnerException            }            else {                $ExceptionMessage = $_.Exception.Message            }
-
-            $ExceptionMessage
+        $ExceptionMessage = $_ | format-list -force        $ExceptionMessage 
     }
 }
 
@@ -375,9 +371,7 @@ function Execute-AsyncRunspaces {
         }
         catch {
 
-            if ($_.Exception.InnerException) {                $ExceptionMessage = $_.Exception.InnerException | format-list -force                #$ExceptionMessage = $_.Exception|format-list -force            }            else {                $ExceptionMessage = $_.Exception | format-list -force                #$ExceptionMessage = $_.Exception|format-list -force            }
-
-            $ExceptionMessage
+            $ExceptionMessage = $_ | format-list -force            $ExceptionMessage 
         }
     }
 
@@ -415,10 +409,7 @@ function Execute-AsyncRunspaces {
             }
         }
         catch {
-
-            if ($_.Exception.InnerException) {                $ExceptionMessage = $_.Exception.InnerException | format-list -force                #$ExceptionMessage = $_.Exception|format-list -force            }            else {                $ExceptionMessage = $_.Exception | format-list -force                #$ExceptionMessage = $_.Exception|format-list -force            }
-
-            $ExceptionMessage
+            $ExceptionMessage = $_ | format-list -force            $ExceptionMessage 
         }
     }
 
@@ -429,10 +420,7 @@ function Execute-AsyncRunspaces {
             $RunspacePool.Close()
         }
         catch {
-
-            if ($_.Exception.InnerException) {                $ExceptionMessage = $_.Exception.InnerException | format-list -force                #$ExceptionMessage = $_.Exception|format-list -force            }            else {                $ExceptionMessage = $_.Exception | format-list -force                #$ExceptionMessage = $_.Exception|format-list -force            }
-
-            $ExceptionMessage
+            $ExceptionMessage = $_ | format-list -force            $ExceptionMessage 
         }
         <#finally {
 

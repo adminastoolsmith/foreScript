@@ -460,7 +460,7 @@ namespace LOGIN_IMPERSONATION
 
         $jsonresult = '{'
         $jsonresult += " 'Error' :"
-        $jsonresult += $_ | ConvertTo-Json
+        $jsonresult += $_ | format-list -force | ConvertTo-Json
         $jsonresult += '}'
         $jsonresult | Out-String
     }
