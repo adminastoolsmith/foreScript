@@ -59,7 +59,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
         $os_params = @{
             'ComputerName' = $Computer;
             'Class' = 'win32_operatingsystem ';
-            #'Filter' = 'ProductType = "1"';
+            'Filter' = 'ProductType = "1"';
             'ErrorAction' = 'Stop'
         }
 

@@ -32,7 +32,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
         $os_params = @{
             'ComputerName' = $Computer;
             'Class' = 'win32_operatingsystem ';
-            #'Filter' = 'ProductType = "1"';
+            'Filter' = 'ProductType = "1"';
             'ErrorAction' = 'Stop'
         }
 
@@ -57,7 +57,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
             'Filter' = 'LocalAccount = TRUE and SID="S-1-5-32-544"';
             'ErrorAction' = 'Stop'        }        if($FS_Credential) {
             $findadminparams.Credential = $FS_Credential
-        }        # Get the local administrators group        $findadmingroup = Get-WmiObject @findadminparams                if ($findadmingroup) {
+        }        # Get the local administrators group        $findadmingroup = Get-WmiObject @findadminparams        $findadmingroupresults = @()                if ($findadmingroup) {
            
             # Get the members of the group based on http://blogs.technet.com/b/heyscriptingguy/archive/2013/12/08/weekend-scripter-who-are-the-administrators.aspx
             $wmiEnumOpts = New-Object System.Management.EnumerationOptions
@@ -65,13 +65,18 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
             $admingroupmembers = $findadmingroup.GetRelated("Win32_Account","Win32_GroupUser","","", "PartComponent","GroupComponent",$false,$wmiEnumOpts)
             if ($admingroupmembers) {
                 foreach ($member in $admingroupmembers) {
-                    $findadmingroupresults = [ordered]@{                        'Date' = (Get-Date -format F).ToString()                        'Computer Name' = $Computer                        'Local Administrator Group Name' = $findadmingroup.Name                        'Domain' = $member.Domain                        'Members of Group' = $member.Caption                        'SID' = $member.SID                    }
 
-                    $findadmingroupresults
+                    $findadmingrouphash = [ordered]@{                        'Date' = (Get-Date -format F).ToString()                        'Computer Name' = $Computer                        'Local Administrator Group Name' = $findadmingroup.Name                        'Domain' = $member.Domain                        'Members of Group' = $member.Caption                        'SID' = $member.SID                    }
+
+                    $findadmingroupresults += New-Object -TypeName PSObject -Property $findadmingrouphash
+
+                    $findadmingrouphash = $null
                     
                 }
             }
-        }        else {            #$setpasswordresults.'Local Administrator Group' = $findadmingroup.Name            #$setpasswordresults.'New Password' = ""        }        #$setpasswordresults        #$obj = New-Object -TypeName PSObject -Property $setpasswordresults        #$obj        
+        }        else {            $findadmingrouphash = [ordered]@{                 'Date' = (Get-Date -format F).ToString()                 'Computer Name' = $Computer                 'Local Administrator Group Name' = ''                 'Domain' = ''                 'Members of Group' = ''                 'SID' = ''            }
+
+            $findadmingroupresults += New-Object -TypeName PSObject -Property $findadmingrouphash            $findadmingrouphash = $null        }        $findadmingroupresults        
 
      }
      catch {
