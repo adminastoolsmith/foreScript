@@ -73,7 +73,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
 
      }
      catch {
-       $ExceptionMessage = $_ | format-list -force       $ExceptionMessage 
+       $ExceptionMessage = $_ | format-list -force | Out-String       "Exception generated for $Computer"       $ExceptionMessage 
      }
      
 

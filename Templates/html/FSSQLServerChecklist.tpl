@@ -10,7 +10,7 @@
    /* do the basic style for the entire table */
      body {
             margin: 0 0 0 0;
-            font-size: 12pt;
+            font-size: 10pt;
      }
      table {
     	     border-collapse: collapse;

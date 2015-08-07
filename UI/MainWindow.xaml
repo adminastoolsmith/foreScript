@@ -24,7 +24,7 @@
             <RowDefinition Height="66*" />
             <RowDefinition Height="8*" />
         </Grid.RowDefinitions>
-        <GroupBox Header="Please provide either the path to a file or the name or ip address of a DHCP server. Note that DHCP Server is also WOL Server." Grid.Row="0" HorizontalAlignment="Stretch" Margin="10,0,10,0">
+        <GroupBox Header="Please select the appropriate option below. Note that DHCP Server is also WOL Server." Grid.Row="0" HorizontalAlignment="Stretch" Margin="10,0,10,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -36,7 +36,7 @@
                 </Grid.ColumnDefinitions>
                 <GroupBox Grid.Row="0" Grid.Column="0" Margin="10,5,10,0">
                     <GroupBox.Header>
-                            <RadioButton Name="ImportFromFileRadioButton" Content="Import computers from File :" GroupName="Import" IsChecked="True"/>
+                            <RadioButton Name="ImportFromFileRadioButton" Content="Provide the name or ip address of a computer or import computers from File :" GroupName="Import" IsChecked="True"/>
                         </GroupBox.Header>
                         <StackPanel HorizontalAlignment="Stretch"  Orientation="Horizontal" IsEnabled="{Binding ElementName=ImportFromFileRadioButton, Path=IsChecked}" >
                             <TextBox Name="SelectFileTextBox" Height="25" Width="550" Margin="10,0,10,0"/>
@@ -69,7 +69,7 @@
         </GroupBox>
         <TabControl Name="MainDisplay"  Grid.Row="1" Margin="10,10,10,0" Background="#FFE5E5E5" >
             <TabItem Header="Console Output" >
-                <RichTextBox Name="ConsoleOutputRichTextBox" ContextMenu="{StaticResource ConsoleOutputContextMenu}" Background="DarkBlue" Foreground="GhostWhite" FontFamily="Consolas" FontSize="14" IsReadOnly="True" VerticalScrollBarVisibility="Visible" AcceptsReturn="True" IsUndoEnabled="False" SpellCheck.IsEnabled="False" >
+                <RichTextBox Name="ConsoleOutputRichTextBox" ContextMenu="{StaticResource ConsoleOutputContextMenu}" Background="DarkBlue" Foreground="GhostWhite" FontFamily="Consolas" FontSize="12" IsReadOnly="True" VerticalScrollBarVisibility="Visible" AcceptsReturn="True" IsUndoEnabled="False" SpellCheck.IsEnabled="False" >
                     <RichTextBox.CacheMode>
                         <BitmapCache EnableClearType="False" RenderAtScale="1" SnapsToDevicePixels="False"  />
                     </RichTextBox.CacheMode>

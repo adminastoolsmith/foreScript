@@ -1,9 +1,10 @@
 ﻿# -----------------------------------------------------------------------------------------
-# Script: Set-AdminPassword.ps1
+# Script: Set-LocalAdmininistrator.ps1
 # Author: Nigel Thomas
 # Date: July 21, 2015
 # Version: 1.0
-# Purpose: This script is used change the local administrator password on desktop computers
+# Purpose: This script is used change the local administrator name, password on desktop computers.
+#          It will also enable the local administrator account as well.
 #
 # Project: foreScript
 #
@@ -21,13 +22,16 @@ if ($Computer -eq $null) {
 }
 
 $PasswdFormatFile = 'c:\psscripts\passwordformat.txt'
-if (Test-Path $PasswdFormatFile ) {
+$RenameAdministratorFile = 'c:\psscripts\renameadministrator.txt'
+
+if ((Test-Path $PasswdFormatFile) -and (Test-Path $RenameAdministratorFile) ) {
     $Passwordformat = Get-Content -Path $PasswdFormatFile  -Raw
-    #$Passwordformat
+    $RenameAdministrator = Get-Content -Path $RenameAdministratorFile  -Raw
 }
 
 else {
-    $message = "Password formating file not found at $PasswdFormatFile."
+    $message = "Could not find the Password formating file at $PasswdFormatFile. `r`n"
+    $message += "Could not find the Administrator Renaming file at $RenameAdministratorFile."
     $message
     return
 }
@@ -59,7 +63,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
         $os_params = @{
             'ComputerName' = $Computer;
             'Class' = 'win32_operatingsystem ';
-            'Filter' = 'ProductType = "1"';
+            #'Filter' = 'ProductType = "1"';
             'ErrorAction' = 'Stop'
         }
 
@@ -88,12 +92,26 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
 
             $setpasswordresults.'Local Administrator Account' = $admin.Name.ToString()
 
-            # Create new password based on the template
+            # Create new password based on the template and we will enable the administrator user account as well
             $NewPassword = Invoke-Expression $Passwordformat 
             #$NewPassword
             $setpasswordresults.'New Password' = $NewPassword
 
             $admin.SetPassword($NewPassword)
+            $admin.UserFlags = 512
+            $admin.SetInfo()
+
+            # Rename the administrator account
+            if ($RenameAdministrator.Length -gt 0) {
+                $admin.psbase.Rename($RenameAdministrator)
+                $admin.SetInfo()
+                $setpasswordresults.'Renamed Account' = $admin.Name.ToString()
+            }
+
+            else {
+                $setpasswordresults.'Renamed Account' = $findadmin
+            }
+
             $admin.SetInfo()
             
             # Halt the script. Need to do this so that event log gets updated on remote computer
@@ -111,7 +129,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
                 $passwdchangeparams.Credential = $FS_Credential
             }
 
-            $setpasswordresults.'Security Event ID 4724' = (Get-WinEvent @passwdchangeparams).Message
+            $setpasswordresults.'Security Event ID 4724' = (Get-WinEvent @passwdchangeparams | Select -First 1).Message
 
             $passwdchangeparams = @{
                 'ComputerName' = $Computer
@@ -124,7 +142,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
                 $passwdchangeparams.Credential = $FS_Credential
             }
 
-            $setpasswordresults.'Security Event ID 4738' = (Get-WinEvent @passwdchangeparams).Message
+            $setpasswordresults.'Security Event ID 4738' = (Get-WinEvent @passwdchangeparams | Select -First 1).Message
 
             # Test that the password was changed by mapping the ADMIN$ share on the computer as the 
             # local administrator with the new password
@@ -142,7 +160,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
                 $passwdchangeparams.Credential = $FS_Credential
             }
 
-            $setpasswordresults.'Security Event ID 4724' = (Get-WinEvent @passwdchangeparams).Message
+            $setpasswordresults.'Security Event ID 4724' = (Get-WinEvent @passwdchangeparams | Select -First 1).Message
 
             $passwdchangeparams = @{
                 'ComputerName' = $Computer
@@ -154,11 +172,11 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
                 $passwdchangeparams.Credential = $FS_Credential
             }
 
-            $setpasswordresults.'Security Event ID 4738' = (Get-WinEvent @passwdchangeparams).Message            $setpasswordresults.'Login Result' = "Network login to $Computer was not successful or an error occured."        }        #$setpasswordresults        $obj = New-Object -TypeName PSObject -Property $setpasswordresults        $obj        
+            $setpasswordresults.'Security Event ID 4738' = (Get-WinEvent @passwdchangeparams | Select -First 1).Message            $setpasswordresults.'Login Result' = "Network login to $Computer was not successful or an error occured."        }        #$setpasswordresults        $obj = New-Object -TypeName PSObject -Property $setpasswordresults        $obj        
 
      }
      catch {
-         $ExceptionMessage = $_ | format-list -force       $ExceptionMessage 
+         $ExceptionMessage = $_ | format-list -force | Out-String       "Exception generated for $Computer"       $ExceptionMessage 
      }
      
 

@@ -7,10 +7,11 @@
             { "name": "SQL Server Checklist", "author": "Nigel Thomas", "description": "This script is used to automate daily checks of database servers.", "folder": "checklist", "file": "Invoke-SQLServerCheckList.ps1", "authtype": "combined", "template": "FSSQLServerChecklist.tpl", "callback" : "" },
             { "name": "SQL Server Blocked Processes", "author": "Nigel Thomas", "description": "This script is used to get blocked processes on SQL Server.", "folder": "database", "file": "Get-BlockedProcess.ps1", "authtype": "combined", "template": "FSSQLServerBlockedProcess.tpl", "callback" : "Kill SPID" },
             { "name": "Antivirus Status", "author": "Nigel Thomas", "description": "This script is used to get Antivirus Product Information.", "folder": "security", "file": "Get-AntivirusProduct.ps1", "authtype": "credential", "template": "FSAntiVirusProduct.tpl", "callback" : "" },
-            { "name": "Reset Adminsitrator Password", "author": "Nigel Thomas", "description": "This script is used to reset the Local Administrator password.", "folder": "security", "file": "Set-AdminPassword.ps1", "authtype": "credential", "template": "FSDefault.tpl", "callback" : "" },
-            { "name": "Get Administrators Group Members", "author": "Nigel Thomas", "description": "This script is used to get the members of the Local Administrators group.", "folder": "security", "file": "Get-LocalAdminMembers.ps1", "authtype": "credential", "template": "FSDefault.tpl", "callback" : "" }
+            { "name": "Reset Local Adminsitrator", "author": "Nigel Thomas", "description": "This script is used to rename the Local Administrator and reset the password.", "folder": "security", "file": "Set-LocalAdministrator.ps1", "authtype": "combined", "template": "FSDefault.tpl", "callback" : "" },
+            { "name": "Get Administrators Group Members", "author": "Nigel Thomas", "description": "This script is used to get the members of the Local Administrators group.", "folder": "security", "file": "Get-LocalAdminMembers.ps1", "authtype": "credential", "template": "FSDefault.tpl", "callback" : "" },
+            { "name": "Remove Administrators Group Members", "author": "Nigel Thomas", "description": "This script is used to remove all users from the Local Administrators group.", "folder": "security", "file": "Remove-LocalAdminMembers.ps1", "authtype": "combined", "template": "FSDefault.tpl", "callback" : "" },
+            { "name": "Get Windows Update Status", "author": "Nigel Thomas", "description": "This script is used to get the status of Windows Update on a computer.", "folder": "security", "file": "Get-WUAUpdateStatus.ps1", "authtype": "combined", "template": "FSDefault.tpl", "callback" : "" }
            ]
 }
-
 
 

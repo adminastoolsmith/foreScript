@@ -66,7 +66,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
             if ($admingroupmembers) {
                 foreach ($member in $admingroupmembers) {
 
-                    $findadmingrouphash = [ordered]@{                        'Date' = (Get-Date -format F).ToString()                        'Computer Name' = $Computer                        'Local Administrator Group Name' = $findadmingroup.Name                        'Domain' = $member.Domain                        'Members of Group' = $member.Caption                        'SID' = $member.SID                    }
+                    $findadmingrouphash = [ordered]@{                        'Run Date' = (Get-Date -format F).ToString()                        'Computer Name' = $Computer                        'Local Administrator Group Name' = $findadmingroup.Name                        'Domain' = $member.Domain                        'Members of Group' = $member.Caption                        'SID' = $member.SID                    }
 
                     $findadmingroupresults += New-Object -TypeName PSObject -Property $findadmingrouphash
 
@@ -80,7 +80,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
 
      }
      catch {
-         $ExceptionMessage = $_ | format-list -force       $ExceptionMessage
+         $ExceptionMessage = $_ | format-list -force | Out-String       $ExceptionMessage
      }
      
 
