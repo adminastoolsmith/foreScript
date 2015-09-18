@@ -280,7 +280,7 @@ namespace LOGIN_IMPERSONATION
         }
     }
     catch {
-          $ExceptionMessage = $_ | format-list -force          $ExceptionMessage 
+          $ExceptionMessage = $_ | format-list -force | Out-String          "Exception generated for $ComputerName in DoImpersonation"          $ExceptionMessage 
     }
 
 }
@@ -306,7 +306,7 @@ $DoCredential = {
 
     }
     catch {
-        $ExceptionMessage = $_ | format-list -force        $ExceptionMessage 
+        $ExceptionMessage = $_ | format-list -force | Out-String        "Exception generated for $ComputerName in DoCredentail"        $ExceptionMessage 
     }
 }
 
@@ -353,7 +353,55 @@ function Execute-AsyncRunspaces {
         
             $RunspaceThreads = @()
 
-            $ScriptBlock = [ScriptBlock]::Create($InputScriptBlock)            if (($PSBoundParameters.ContainsKey('UserName')) -and ($PSBoundParameters.ContainsKey('Password'))) {                                if ($AuthenticationType -eq 'credential') {                    $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Param(`$Computer, `$UserName, `$Password, `$CallBackParams, [Switch]`$DoCallBack) `r`n" + $DoCredential.ToString() + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())                }                if ($AuthenticationType -eq 'impersonation'){                    $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Param(`$Computer, `$UserName, `$Password, `$CallBackParams, [Switch]`$DoCallBack) `r`n" + $DoImpersonation.ToString() + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())                }                if ($AuthenticationType -eq 'combined'){                    $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Param(`$Computer, `$UserName, `$Password, `$CallBackParams, [Switch]`$DoCallBack) `r`n" + $DoImpersonation.ToString() + "`r`n" + $DoCredential.ToString() + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())                }            }            else {                $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock("Param(`$Computer, `$CallBackParams, [Switch]`$DoCallBack) `r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())
+            $TempScriptBlock  = [System.Management.Automation.Language.Parser]::ParseInput($InputScriptBlock, [ref]$null, [ref]$null)
+
+            # If no parameter block is defined in the script then provdide it
+            if ($TempScriptBlock.ParamBlock -eq $null) {
+
+                $DefaultParamBlock = "Param(`$ComputerName, `$CallBackParams, [Switch]`$DoCallBack )"
+                $CredentialParamBlock = "Param(`$ComputerName, `$UserName, `$Password, `$CallBackParams, [Switch]`$DoCallBack )" 
+
+            }
+
+            # Extract the parameter block and add additional parametrs
+            if ($TempScriptBlock.ParamBlock -ne $null) {
+          
+                $TempParamBlock = $TempScriptBlock.ParamBlock.Extent.Text.Substring(0, $TempScriptBlock.ParamBlock.Extent.Text.Length -1).TrimEnd()
+
+                if ($TempScriptBlock.ParamBlock.Attributes -ne $null) {
+                    $TempParamBlockAttributes = $TempScriptBlock.ParamBlock.Attributes.Extent.Text.Substring(0, $TempScriptBlock.ParamBlock.Attributes.Extent.Text.Length).TrimEnd()
+                }
+
+                #if ($TempScriptBlock.ParamBlock.Extent.Text.Contains("ComputerName")) {
+                if ("`$ComputerName" -in $TempScriptBlock.ParamBlock.Parameters.Name.Extent.Text) {
+
+                    $DefaultParamBlock = $TempParamBlockAttributes + "`r`n" + $TempParamBlock + ", `r`n `$CallBackParams, [Switch]`$DoCallBack )"
+                    $CredentialParamBlock = $TempParamBlockAttributes + "`r`n" + $TempParamBlock + ", `r`n `$UserName, `$Password, `$CallBackParams, [Switch]`$DoCallBack )" 
+
+                }
+                else {
+
+                    $DefaultParamBlock = $TempParamBlockAttributes + "`r`n" + $TempParamBlock + ", `r`n `$ComputerName, `$CallBackParams, [Switch]`$DoCallBack )"
+                    $CredentialParamBlock = $TempParamBlockAttributes + "`r`n" + $TempParamBlock + ", `r`n `$ComputerName, `$UserName, `$Password, `$CallBackParams, [Switch]`$DoCallBack )"
+
+                }
+                
+                if ($TempParamBlockAttributes -ne $null) {
+
+                    $InputScriptBlock = $InputScriptBlock.Replace($TempScriptBlock.ParamBlock.Attributes.Extent.Text, "")
+         
+                }
+
+                $InputScriptBlock = $InputScriptBlock.Replace($TempScriptBlock.ParamBlock.Extent.Text, "")
+                
+                #$InputScriptBlock
+                
+            }
+
+            #$DefaultParamBlock
+            #$CredentialParamBlock
+
+            $ScriptBlock = [ScriptBlock]::Create($InputScriptBlock)            if (($PSBoundParameters.ContainsKey('UserName')) -and ($PSBoundParameters.ContainsKey('Password'))) {                                if ($AuthenticationType -eq 'credential') {                    $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($CredentialParamBlock + "`r`n" + $DoCredential.ToString() + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())                }                if ($AuthenticationType -eq 'impersonation'){                    $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($CredentialParamBlock + "`r`n" + $DoImpersonation.ToString() + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())                }                if ($AuthenticationType -eq 'combined'){                    $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($CredentialParamBlock + "`r`n" + $DoImpersonation.ToString() + "`r`n" + $DoCredential.ToString() + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())                }            }            else {                $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($DefaultParamBlock + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())
             }
 
             #$ScriptBlock
@@ -371,7 +419,7 @@ function Execute-AsyncRunspaces {
         }
         catch {
 
-            $ExceptionMessage = $_ | format-list -force            $ExceptionMessage 
+            $ExceptionMessage = $_ | format-list -force            "Exception from Execute-AsyncRunspaces Begin block ..."            $ExceptionMessage 
         }
     }
 
@@ -379,27 +427,31 @@ function Execute-AsyncRunspaces {
 
         try {
 
-            foreach ($Computer in $InputObject) {
+            foreach ($ComputerName in $InputObject) {
 
-                if ($Computer -eq $null) {
+                if ($ComputerName -eq $null) {
                     continue
                 }
 
-                if ([String]::IsNullOrEmpty($Computer)) {
+                if ([String]::IsNullOrEmpty($ComputerName)) {
                     continue
                 }
 
-                if ([String]::IsNullOrWhiteSpace($Computer)) {
+                if ([String]::IsNullOrWhiteSpace($ComputerName)) {
                     continue
                 }
 
                 if (($PSBoundParameters.ContainsKey('UserName')) -and ($PSBoundParameters.ContainsKey('Password'))) {
 
-                    $powershell = [Powershell]::Create().AddScript($ScriptBlock).AddArgument($Computer).AddArgument($UserName).AddArgument($Password).AddArgument($CallBackParams).AddArgument($DoCallBack)
+                    $powershell = [Powershell]::Create().AddScript($ScriptBlock).AddParameter('ComputerName', $ComputerName).AddParameter('UserName', $UserName).AddParameter('Password', $Password).AddParameter('CallBackParams', $CallBackParams).AddParameter('DoCallBack', $DoCallBack)
                 }
                 else {
 
-                    $powershell = [Powershell]::Create().AddScript($ScriptBlock).AddArgument($Computer).AddArgument($CallBackParams).AddArgument($DoCallBack)
+                    $powershell = [Powershell]::Create().AddScript($ScriptBlock).AddParameter('ComputerName', $ComputerName).AddParameter('CallBackParams', $CallBackParams).AddParameter('DoCallBack', $DoCallBack)
+                }
+
+                foreach ($key in $rsDataTransfer.scriptparameters.Keys) {
+                    [void]$powershell.AddParameter($key, $rsDataTransfer.scriptparameters.$key)
                 }
 
                 $powershell.RunspacePool = $RunspacePool
@@ -409,7 +461,7 @@ function Execute-AsyncRunspaces {
             }
         }
         catch {
-            $ExceptionMessage = $_ | format-list -force            $ExceptionMessage 
+            $ExceptionMessage = $_ | format-list -force            "Exception from Execute-AsyncRunspaces Process block ..."            $ExceptionMessage 
         }
     }
 
@@ -420,7 +472,7 @@ function Execute-AsyncRunspaces {
             $RunspacePool.Close()
         }
         catch {
-            $ExceptionMessage = $_ | format-list -force            $ExceptionMessage 
+            $ExceptionMessage = $_ | format-list -force            "Exception from Execute-AsyncRunspaces  End Block ..."            $ExceptionMessage 
         }
         <#finally {
 

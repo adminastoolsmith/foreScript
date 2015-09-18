@@ -1,9 +1,9 @@
 ﻿    $objWOLInfo = [ordered]@{}
-    $objWOLInfo.ClientIP = $Computer
+    $objWOLInfo.ClientIP = $ComputerName
     #$objWOLInfo.ClientName = $InputObject.ClientName
     #$objWOLInfo.MacAddress = $InputObject.MacAddress
         
-    if (Test-Connection -ComputerName $Computer -BufferSize 16 -Count 1 -Quiet -ErrorAction SilentlyContinue) {
+    if (Test-Connection -ComputerName $ComputerName -BufferSize 16 -Count 1 -Quiet -ErrorAction SilentlyContinue) {
 
         $objWOLInfo.Online = $true
     }

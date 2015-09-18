@@ -16,13 +16,13 @@
 #Requires -version 3
 
 
-if ($Computer -eq $null) {
-    $Computer = $env:COMPUTERNAME
+if ($ComputerName -eq $null) {
+    $ComputerName = $env:COMPUTERNAME
 }
 
 
 
-if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
+if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) {
 
 
     try {
@@ -30,7 +30,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
         # Get the CSName for client computers.
         # ProductType = 1 designate a desktop computer
         $os_params = @{
-            'ComputerName' = $Computer;
+            'ComputerName' = $ComputerName;
             'Class' = 'win32_operatingsystem ';
             'Filter' = 'ProductType = "1"';
             'ErrorAction' = 'Stop'
@@ -47,12 +47,12 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
 
         # If we did not get anything, ie not client computer bail out, or just could not get the name then bail out
         if (!$CSName) {
-            $message = "$Computer is running a Server Operating System.`r`n"
+            $message = "$ComputerName is running a Server Operating System.`r`n"
             $message += "This script can only be used to retrieve the members of the local Administrator group on Desktop computers.`r`n"
             $message
             return
         }
-        # Find the local administrator group. We will use the well know SID for the local administrators group        $findadminparams = @{            'ComputerName' = $Computer;
+        # Find the local administrator group. We will use the well know SID for the local administrators group        $findadminparams = @{            'ComputerName' = $ComputerName;
             'Class' = 'Win32_Group';
             'Filter' = 'LocalAccount = TRUE and SID="S-1-5-32-544"';
             'ErrorAction' = 'Stop'        }        if($FS_Credential) {
@@ -66,7 +66,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
             if ($admingroupmembers) {
                 foreach ($member in $admingroupmembers) {
 
-                    $findadmingrouphash = [ordered]@{                        'Run Date' = (Get-Date -format F).ToString()                        'Computer Name' = $Computer                        'Local Administrator Group Name' = $findadmingroup.Name                        'Domain' = $member.Domain                        'Members of Group' = $member.Caption                        'SID' = $member.SID                    }
+                    $findadmingrouphash = [ordered]@{                        'Run Date' = (Get-Date -format F).ToString()                        'Computer Name' = $ComputerName                        'Local Administrator Group Name' = $findadmingroup.Name                        'Domain' = $member.Domain                        'Members of Group' = $member.Caption                        'SID' = $member.SID                    }
 
                     $findadmingroupresults += New-Object -TypeName PSObject -Property $findadmingrouphash
 
@@ -74,20 +74,20 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
                     
                 }
             }
-        }        else {            $findadmingrouphash = [ordered]@{                 'Date' = (Get-Date -format F).ToString()                 'Computer Name' = $Computer                 'Local Administrator Group Name' = ''                 'Domain' = ''                 'Members of Group' = ''                 'SID' = ''            }
+        }        else {            $findadmingrouphash = [ordered]@{                 'Date' = (Get-Date -format F).ToString()                 'Computer Name' = $ComputerName                 'Local Administrator Group Name' = ''                 'Domain' = ''                 'Members of Group' = ''                 'SID' = ''            }
 
             $findadmingroupresults += New-Object -TypeName PSObject -Property $findadmingrouphash            $findadmingrouphash = $null        }        $findadmingroupresults        
 
      }
      catch {
-         $ExceptionMessage = $_ | format-list -force | Out-String       $ExceptionMessage
+         $ExceptionMessage = $_ | format-list -force | Out-String       "Exception generated for $ComputerName"       $ExceptionMessage
      }
      
 
 }
 else {
   
-  "Could not connect to computer $Computer...`r`n" 
+  "Could not connect to computer $ComputerName ...`r`n" 
 
 
 }

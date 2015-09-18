@@ -58,6 +58,7 @@
 <script type="text/javascript">TEMPL_JQUERY_VERSION</script>
 <script type="text/javascript">TEMPL_JQUERYDATATABLE_VERSION</script>
 
+
 <script type="text/javascript">
 
                 var query1 = TEMPL_QUERY1;
@@ -66,11 +67,11 @@
                 $(document).ready(function () {
                 $(document)[0].oncontextmenu = function() { return false; };
 
-              if (typeof(query1) != "undefined") {
+              //if (typeof(query1) != "undefined") {
                   $('#Query1').append(CreateTableView(query1));
-              }
+              //}
 
-              if (typeof(query2) != "undefined") {
+              //if (typeof(query2) != "undefined") {
                   $('#Query2').append(CreateTableView(query2)).each(function () { 
 	           $(this).find('table td:nth-child(19)').each(function () { 
                       var jsondate = new Date(parseInt($(this).text().substr(6)));
@@ -81,7 +82,7 @@
                       $(this).text(jsondate);
                     });
                  });
-              }
+              //}
              
              
              $('tr:odd').css('background-color','#E5EEFF');

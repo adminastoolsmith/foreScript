@@ -15,20 +15,20 @@
 #Requires -version 3
 
 
-if ($Computer -eq $null) {
-    $Computer = $env:COMPUTERNAME
+if ($ComputerName -eq $null) {
+    $ComputerName = $env:COMPUTERNAME
 }
 
 
 
-if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
+if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) {
 
 
     try {
 
         # Get the BuildNumber of the computer
         $os_params = @{
-            'ComputerName' = $Computer;
+            'ComputerName' = $ComputerName;
             'Class' = 'win32_operatingsystem ';
             'Filter' = 'ProductType > "1"';
             'ErrorAction' = 'Stop'
@@ -47,11 +47,11 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
 
         # If we did not get anything, so just  bail out
         if (!$osresults) {
-            $message = "The script is designed to run against server and $Computer does not seem to be a server.`r`n"
+            $message = "The script is designed to run against server and $ComputerName does not seem to be a server.`r`n"
             $message
             return
         }
-        # Connect to the registry and see if the computer has pending windows updates        $RegCon = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]"LocalMachine",$Computer)         # If Vista/2008 & Above query the CBS Reg Key         If ($osresults.BuildNumber -ge 6001) {            $RegSubKeysCBS = $RegCon.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\").GetSubKeyNames()             if ($RegSubKeysCBS -contains "RebootPending" ) {                $CBSRebootPend = $true            }            else {                $CBSRebootPend = $false            }        }        else {            # Query WUAU from the registry             $RegWUAU = $RegCon.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\")             $RegSubKeysWUAU = $RegWUAU.GetSubKeyNames()             if ($RegSubKeysWUAU -contains "RebootRequired" ) {                $WUAURebootReq = $true            }            else {                $WUAURebootReq = $false            }        }        # Closing registry connection         $RegCon.Close()         $wuaupdatestatus = [ordered]@{            'Run Date' = (Get-Date).ToString()            'Computer Name' = $Computer        }        # Connect to the computer and query the actual updates        $getupdateparams = @{           'ComputerName' = $Computer;
+        # Connect to the registry and see if the computer has pending windows updates        $RegCon = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]"LocalMachine",$ComputerName)         # If Vista/2008 & Above query the CBS Reg Key         If ($osresults.BuildNumber -ge 6001) {            $RegSubKeysCBS = $RegCon.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\").GetSubKeyNames()             if ($RegSubKeysCBS -contains "RebootPending" ) {                $CBSRebootPend = $true            }            else {                $CBSRebootPend = $false            }        }        else {            # Query WUAU from the registry             $RegWUAU = $RegCon.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\")             $RegSubKeysWUAU = $RegWUAU.GetSubKeyNames()             if ($RegSubKeysWUAU -contains "RebootRequired" ) {                $WUAURebootReq = $true            }            else {                $WUAURebootReq = $false            }        }        # Closing registry connection         $RegCon.Close()         $wuaupdatestatus = [ordered]@{            'Run Date' = (Get-Date).ToString()            'Computer Name' = $ComputerName        }        # Connect to the computer and query the actual updates        $getupdateparams = @{           'ComputerName' = $ComputerName;
            #'Filter' = 'sourcename = "Microsoft-Windows-WindowsUpdateClient" and EventCode=21';
            'ErrorAction' = 'Stop'        }        if ($CBSRebootPend -or $WUAURebootReq) {            $wuaupdatestatus.'Reboot Pending' = $true            $getupdateparams.Filter = 'logfile = "System" and SourceName = "Microsoft-Windows-WindowsUpdateClient" and EventCode=21'        }        else {            $wuaupdatestatus.'Reboot Pending' = $false            $getupdateparams.Filter = 'logfile = "System" and SourceName = "Microsoft-Windows-WindowsUpdateClient" and EventCode=17'        }        # If this is a desktop computer then query the reliability records        # for servers query the NTLogEvent        if ($osresults.ProductType -ge 1) {                $getupdateparams.Class = 'Win32_NTLogEvent'        }        else {            $getupdateparams.Class = 'Win32_ReliabilityRecords'        }        if($FS_Credential) {
             $getupdateparams.Credential = $FS_Credential
@@ -78,14 +78,14 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
 
      }
      catch {
-         $ExceptionMessage = $_ | format-list -force | Out-String       "Exception generated for $Computer"       $ExceptionMessage
+         $ExceptionMessage = $_ | format-list -force | Out-String       "Exception generated for $ComputerName"       $ExceptionMessage
      }
      
 
 }
 else {
   
-  "Could not connect to computer $Computer...`r`n" 
+  "Could not connect to computer $ComputerName ...`r`n" 
 
 
 }

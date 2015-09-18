@@ -12,11 +12,42 @@ function Get-QueryResults {
         $Query
     )
 
+    try {
     $ds = New-object "System.Data.DataSet" "SQLServerChecklistData"
     #$ds = New-object "System.Data.DataTable" "SQLServerChecklistData"
     $da = New-Object "System.Data.SqlClient.SqlDataAdapter" ($Query, $SQLConnection)
     $da.Fill($ds) | Out-Null
-    return @(,$ds)
+    #return @(,$ds)
+
+    if ($ds.Tables[0].Rows.Count  -gt 0) {
+        return $ds
+    }
+
+
+    # Return an empty dataset
+    $newRow = $ds.Tables[0].NewRow()
+    #$newRow[0] = $Query
+    $ds.Tables[0].Rows.Add($newRow)  
+
+    return $ds
+
+    }
+    catch {
+        # Return a dataset with the error
+        $ds = New-object "System.Data.DataSet" "SQLServerChecklistData"
+        $dt = New-object "System.Data.DataTable" "SQLServerChecklistData"
+        $dt.Columns.Add('Query')
+        $dt.Columns.Add('Error')
+        $ds.Tables.Add($dt)
+        $newRow = $ds.Tables[0].NewRow()
+        $newRow[0] = $Query
+        $newRow[1] = $_
+        $ds.Tables[0].Rows.Add($newRow)  
+
+        $ds
+    }
+
+
     
 }$sqlagentquery = [ordered]@{    "SQL Instance" = "SELECT           SERVERPROPERTY('MachineName') as Host,          SERVERPROPERTY('InstanceName') as Instance,          SERVERPROPERTY('Edition') as Edition, /*shows 32 bit or 64 bit*/          SERVERPROPERTY('ProductLevel') as ProductLevel, /* RTM or SP1 etc*/          Case SERVERPROPERTY('IsClustered') when 1 then 'CLUSTERED' else          'STANDALONE' end as ServerType, @@VERSION as VersionNumber"    "SysAdmin Role" = "SELECT l.name, l.createdate, l.updatedate, l.accdate, l.status, l.denylogin, l.hasaccess, l.isntname, l.isntgroup, l.isntuser                 FROM master.dbo.syslogins l WHERE l.sysadmin = 1 OR l.securityadmin = 1"    "Backup Status" = "SELECT CONVERT(CHAR(100), SERVERPROPERTY('Servername')) AS Server, msdb.dbo.backupset.database_name, msdb.dbo.backupset.backup_start_date,
 
@@ -107,23 +138,25 @@ function Get-QueryResults {
                                 and msdb.dbo.agent_datetime(run_date, run_time) 
                                 BETWEEN @Date1 and @Date2 "    "Running SQL Agent Jobs" = "SELECT SYSJOBS.Name, SYSJOBS.Job_Id, SYSPROCESSES.HostName, SYSPROCESSES.LogiName, * 
                                FROM MSDB.dbo.SYSJOBS JOIN MASTER.dbo.SYSPROCESSES
-                               ON SUBSTRING(SYSPROCESSES.PROGRAM_NAME,30,34) = MASTER.dbo.fn_varbintohexstr ( SYSJOBS.job_id) "}if ($Computer -eq $null) {    $Computer = $env:COMPUTERNAME}$checklistparams = @{    'ComputerName' = $Computer    'Class' = 'SqlServiceAdvancedProperty'    'ErrorAction' = 'SilentlyContinue'}if ($FS_Credential) {
+                               ON SUBSTRING(SYSPROCESSES.PROGRAM_NAME,30,34) = MASTER.dbo.fn_varbintohexstr ( SYSJOBS.job_id) "}if ($ComputerName -eq $null) {    $ComputerName = $env:COMPUTERNAME}$checklistparams = @{    'ComputerName' = $ComputerName    'Class' = 'SqlServiceAdvancedProperty'    'ErrorAction' = 'SilentlyContinue'}if ($FS_Credential) {
 
     $checklistparams.Credential = $FS_Credential
-}# Get the sqlservices running on the computer by querying wmi namespace of SQL Server. This works with SQL Server 2005 and greater$sqlwminamespace = @('ComputerManagement', 'ComputerManagement10', 'ComputerManagement11', 'ComputerManagement12')$installedinstance = @()if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) { foreach ($namespace in $sqlwminamespace) {    $getinstance = Get-WmiObject @checklistparams -Namespace "root\Microsoft\SqlServer\$namespace"    if ($getinstance) {        $installedinstance += $getinstance | Where-Object {$_.PropertyName -eq 'VERSION'} | Select-Object ServiceName, PropertyName, PropertyStrValue    }}# Once we have installed SQL Server instances on the server go through them and get the SQL Agent Status#$queryresult = @()$result = @()if ($installedinstance) {    #$installedinstance    foreach ($instance in $installedinstance) {        if ($instance.ServiceName -like '*ReportServer*') {           continue        }        if ($instance.ServiceName -like '*OLAPService*') {           continue        }        if ($instance.ServiceName -like '*ANALYSIS*') {           continue        }        $queryresult = @()        $ServiceName = $instance.ServiceName        if ($ServiceName -eq 'MSSQLSERVER') {            $ConnectionString = "Server=$Computer;Integrated Security=SSPI;"        }        else {            # Remove MSSQL$ from the servcie name            $ServiceName = $ServiceName.ToString().Replace('MSSQL$', '')            $ConnectionString = "Server=$Computer\$ServiceName;Integrated Security=SSPI;"
+}# Get the sqlservices running on the computer by querying wmi namespace of SQL Server. This works with SQL Server 2005 and greater$sqlwminamespace = @('ComputerManagement', 'ComputerManagement10', 'ComputerManagement11', 'ComputerManagement12')$installedinstance = @()if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) { #try {foreach ($namespace in $sqlwminamespace) {    $getinstance = Get-WmiObject @checklistparams -Namespace "root\Microsoft\SqlServer\$namespace"    if ($getinstance) {        $installedinstance += $getinstance | Where-Object {$_.PropertyName -eq 'VERSION'} | Select-Object ServiceName, PropertyName, PropertyStrValue    }}# Once we have installed SQL Server instances on the server go through them and get the SQL Agent Status#$queryresult = @()$result = @()if ($installedinstance) {    #$installedinstance    foreach ($instance in $installedinstance) {        if ($instance.ServiceName -like '*ReportServer*') {           continue        }        if ($instance.ServiceName -like '*OLAPService*') {           continue        }        if ($instance.ServiceName -like '*ANALYSIS*') {           continue        }        $queryresult = @()        $ServiceName = $instance.ServiceName        if ($ServiceName -eq 'MSSQLSERVER') {            $ConnectionString = "Server=$ComputerName;Integrated Security=SSPI;"        }        else {            # Remove MSSQL$ from the servcie name            $ServiceName = $ServiceName.ToString().Replace('MSSQL$', '')            $ConnectionString = "Server=$ComputerName\$ServiceName;Integrated Security=SSPI;"
         }
 
         #$ConnectionString 
-        $cn = New-Object System.Data.SqlClient.SqlConnection($ConnectionString)        foreach ($key in $sqlagentquery.Keys) {            #$sqlagentquery[$key]            $queryresult += Get-QueryResults -SQLConnection $cn -Query $sqlagentquery[$key]        }         #$queryresult.Tables        if ($ServiceName -eq 'MSSQLSERVER') {            $header = "SQL Server Checklist for Instance {0} ran on {1}" -f ($Computer, (Get-Date))        }        else {            $header = "SQL Server Checklist for Instance {0}\{1} ran on {2}" -f ($Computer, $ServiceName, (Get-Date))        } 
+        $cn = New-Object System.Data.SqlClient.SqlConnection($ConnectionString)        foreach ($key in $sqlagentquery.Keys) {            #$sqlagentquery[$key]            $queryresult += Get-QueryResults -SQLConnection $cn -Query $sqlagentquery[$key]        }        #$queryresult.Tables        if ($ServiceName -eq 'MSSQLSERVER') {            $header = "SQL Server Checklist for Instance {0} ran on {1}" -f ($ComputerName, (Get-Date))        }        else {            $header = "SQL Server Checklist for Instance {0}\{1} ran on {2}" -f ($ComputerName, $ServiceName, (Get-Date))        } 
 
         $fsresult = Format-FSTypes -InputObject $queryresult.Tables -Type 'ForeScript.Types.SQLServerData' -Header $header
-        $result += $fsresult        $queryresult = $null    }    } #$queryresult.Tables <#if ($ServiceName -eq 'MSSQLSERVER') {    $header = "SQL Server Checklist for Instance {0} ran on {1}" -f ($Computer, (Get-Date)) } else {    $header = "SQL Server Checklist for Instance {0}\{1} ran on {2}" -f ($Computer, $ServiceName, (Get-Date)) } 
+        $result += $fsresult        $queryresult = $null        $cn.Close()    }    } #$queryresult.Tables <#if ($ServiceName -eq 'MSSQLSERVER') {    $header = "SQL Server Checklist for Instance {0} ran on {1}" -f ($ComputerName, (Get-Date)) } else {    $header = "SQL Server Checklist for Instance {0}\{1} ran on {2}" -f ($ComputerName, $ServiceName, (Get-Date)) } 
 
  $fsresult = Format-FSTypes -InputObject $queryresult.Tables -Type 'ForeScript.Types.SQLServerChecklist' -Header $header
- $fsresult#> # Output all of the ForeScript.Types.SQLServerChecklist results foreach ($r in $result) {    $r }}
+ $fsresult#> # Output all of the ForeScript.Types.SQLServerChecklist results foreach ($r in $result) {    $r } <#} catch {
+         $ExceptionMessage = $_ | format-list -force | Out-String       "Exception generated for $ComputerName"       $ExceptionMessage
+     }#>}
 else {
   
-  "Could not connect to computer $Computer...`r`n" 
+  "Could not connect to computer $ComputerName ...`r`n" 
 
 
 }

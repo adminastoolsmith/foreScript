@@ -15,15 +15,33 @@
 
 #Requires -version 3
 
+[CmdletBinding()]
+ Param (
+    $ComputerName = $env:COMPUTERNAME,
 
-if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    $ProductGUID,
+    
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    $ProductName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    $ProductVersion
+    
+ )
+
+
+if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) {
 
 
     try {
 
         
 
-        $opt = New-CimSessionOption -Protocol DCOM        $sessparams = @{            'ComputerName' = $Computer;            'SessionOption' = $opt;            'ErrorAction' = 'Stop'        }        # If we are going to use alternate credentials to access the computer then supply it        if ($cred) {            $sessparams.Credential = $cred        }        $csd = New-CimSession @sessparams
+        $opt = New-CimSessionOption -Protocol DCOM        $sessparams = @{            'ComputerName' = $ComputerName;            'SessionOption' = $opt;            'ErrorAction' = 'Stop'        }        # If we are going to use alternate credentials to access the computer then supply it        if ($cred) {            $sessparams.Credential = $cred        }        $csd = New-CimSession @sessparams
 
         # Get the OS version for client computers.
         # ProductType = 1 designate a desktop computer
@@ -49,7 +67,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
         # This will slow down getting the product information and the reconfiguration of sofwtare on production
         # computers could be an issue
 
-        # Code based on http://stackoverflow.com/questions/327650/wmi-invalid-class-error-trying-to-uninstall-a-software-on-remote-pc
+        # Code based on http://stackoverflow.com/questions/3577338/using-wmi-to-uninstall-applications-remotely
         $connoptions = New-Object System.Management.ConnectionOptions
 
         if ($cred) {
@@ -57,11 +75,11 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
             $networkCred = $cred.GetNetworkCredential()
             $connoptions.Username=$networkCred.Domain.ToString() + "\" + $networkCred.UserName.ToString()            $connoptions.Password=$networkCred.Password
         }
-                $connoptions.Authentication=[System.Management.AuthenticationLevel]::PacketPrivacy        #$co.EnablePrivileges=$true        $scope = New-Object System.Management.ManagementScope("\\$Computer\root\cimv2", $connoptions)        $scope.Connect()        #$objoptions = New-Object System.Management.ObjectGetOptions        # Win32_Product management objects can be accessed in the format of         # Win32_Product.IdentifyingNumber="{109A5A16-E09E-4B82-A784-D1780F1190D6`}",Name="Windows Firewall Configuration Provider",version="1.2.3412.0"        $objPath = "Win32_Product.IdentifyingNumber=`"`{109A5A16-E09E-4B82-A784-D1780F1190D6`}`",Name=`"Windows Firewall Configuration Provider`",version=`"1.2.3412.0`""        $path = New-Object System.Management.ManagementPath($objPath)        $InstalledProduct = New-Object System.Management.ManagementObject($scope, $path, $null)
+                $connoptions.Authentication=[System.Management.AuthenticationLevel]::PacketPrivacy        #$co.EnablePrivileges=$true        $scope = New-Object System.Management.ManagementScope("\\$ComputerName\root\cimv2", $connoptions)        $scope.Connect()        #$objoptions = New-Object System.Management.ObjectGetOptions        # Win32_Product management objects can be accessed in the format of         # Win32_Product.IdentifyingNumber="",Name="",version=""        #$objPath = "Win32_Product.IdentifyingNumber=`"`{109A5A16-E09E-4B82-A784-D1780F1190D6`}`",Name=`"Windows Firewall Configuration Provider`",version=`"1.2.3412.0`""        $objPath = "Win32_Product.IdentifyingNumber=`"$ProductGUID`",Name=`"$ProductName`",version=`"$ProductVersion`""        #$objPath        $path = New-Object System.Management.ManagementPath($objPath)        $InstalledProduct = New-Object System.Management.ManagementObject($scope, $path, $null)
 
         #$InstalledProduct
 
-        if ($InstalledProduct) {                        # An error occured            if ($InstalledProduct.Message) {                                "$objPath not found on $Computer `r`n"                return            }            #Create hash-table for each computer             $ht = [ordered]@{}             $ht.'Computer Name' = $Computer            $ht.'Identifying Number' = $InstalledProduct.IdentifyingNumber            $ht.'Name' = $InstalledProduct.Name            $ht.'Description' = $InstalledProduct.Description            $ht.‘Install Date’ = $InstalledProduct.InstallDate            $ht.‘Vendor’ = $InstalledProduct.Vendor            $ht.‘Version’ = $InstalledProduct.Version                    #Create a new object for each computer             New-Object -TypeName PSObject -Property $ht        }        <#else {            #Create hash-table for each computer             $ht = [ordered]@{}             $ht.'Computer Name' = $Computer            $ht.'IdentifyingNumber' = ''             $ht.'Name' = ''            $ht.‘Vendor’ = ''             $ht.‘Version’ = ''            $ht.‘Caption’ = 'Not installed'                    #Create a new object for each computer             New-Object -TypeName PSObject -Property $ht         }#>
+        if ($InstalledProduct) {                        # An error occured            if ($InstalledProduct.Message) {                                "$objPath not found on $ComputerName `r`n"                return            }            #Create hash-table for each computer             $ht = [ordered]@{}             $ht.'Computer Name' = $ComputerName            $ht.'Identifying Number' = $InstalledProduct.IdentifyingNumber            $ht.'Name' = $InstalledProduct.Name            $ht.'Description' = $InstalledProduct.Description            $ht.‘Install Date’ = $InstalledProduct.InstallDate            $ht.‘Vendor’ = $InstalledProduct.Vendor            $ht.‘Version’ = $InstalledProduct.Version                    #Create a new object for each computer             New-Object -TypeName PSObject -Property $ht        }
 
      }
      catch {
@@ -74,7 +92,7 @@ if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) {
 }
 else {
   
-  "Could not connect to computer $Computer...`r`n" 
+  "Could not connect to computer $ComputerName ...`r`n" 
 
 
 }

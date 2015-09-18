@@ -1,16 +1,16 @@
 <#    .Synopsis     Executes a series of WMI commands against a computer   .Description    Executes a series of WMI commands against a computer   .Notes     NAME: Invoke-ServerCheckList.PS1    AUTHOR: Nigel Thomas    LASTEDIT: 2013-03-05      CHECKLISTTYPE: Server   .Link     Http://toolmaker.brycoretechnologies.com #>
 
-if (Test-Connection -Computer $Computer -Count 1 -BufferSize 16 -Quiet ) { 
+if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) { 
 
 $FS_CheckListResults = [ordered]@{}
 
-#$FS_CheckListResults.Header = "Server Checklist for {0} ran on {1}" -f $Computer, (Get-Date)
+#$FS_CheckListResults.Header = "Server Checklist for {0} ran on {1}" -f $ComputerName, (Get-Date)
 
 # Parameters to pass to the checklist queries.
 # We only pass the computer name and the login credentials if required
 $checklistparams = @{}
 
-$checklistparams.ComputerName = $Computer
+$checklistparams.ComputerName = $ComputerName
 
 if ($FS_Credential) {
 
@@ -45,7 +45,7 @@ $FS_CheckListResults.ApplicationLog = Get-WmiObject -class Win32_NTLogEvent @che
 
  #$FS_CheckListResults
 
- $header = "Server Checklist for {0} ran on {1}" -f ($Computer, (Get-Date))
+ $header = "Server Checklist for {0} ran on {1}" -f ($ComputerName, (Get-Date))
 
  $fsresult = Format-FSTypes -InputObject $FS_CheckListResults -Type 'ForeScript.Types.ServerChecklist' -Header $header
  $fsresult
@@ -53,7 +53,7 @@ $FS_CheckListResults.ApplicationLog = Get-WmiObject -class Win32_NTLogEvent @che
 }
 else {
   
-  "Could not connect to computer $Computer...`r`n" 
+  "Could not connect to computer $ComputerName ...`r`n" 
 
 
 }
