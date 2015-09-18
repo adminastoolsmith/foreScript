@@ -16,9 +16,11 @@
 #Requires -version 3
 
 
-if ($ComputerName -eq $null) {
+[CmdletBinding()]
+ Param (
     $ComputerName = $env:COMPUTERNAME
-}
+    
+ )
 
 $StartupLocationsFile = 'c:\psscripts\startuplocations.txt'
 if (Test-Path $StartupLocationsFile) {
@@ -43,7 +45,7 @@ if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) {
         $os_params = @{
             'ComputerName' = $ComputerName;
             'Class' = 'win32_operatingsystem ';
-            #'Filter' = 'ProductType = "1"';
+            'Filter' = 'ProductType = "1"';
             'ErrorAction' = 'Stop'
         }
 

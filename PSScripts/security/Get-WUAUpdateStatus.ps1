@@ -15,9 +15,11 @@
 #Requires -version 3
 
 
-if ($ComputerName -eq $null) {
+[CmdletBinding()]
+ Param (
     $ComputerName = $env:COMPUTERNAME
-}
+    
+ )
 
 
 

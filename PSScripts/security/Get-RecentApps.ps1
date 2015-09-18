@@ -16,9 +16,11 @@
 
 #Requires -version 3
 
-if ($ComputerName -eq $null) {
+[CmdletBinding()]
+ Param (
     $ComputerName = $env:COMPUTERNAME
-}
+    
+ )
 
 
 if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) {

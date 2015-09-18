@@ -18,9 +18,11 @@
 #Requires -version 3
 
 
-if ($ComputerName -eq $null) {
+[CmdletBinding()]
+ Param (
     $ComputerName = $env:COMPUTERNAME
-}
+    
+ )
 
 $PasswdHashFile = 'c:\psscripts\passwordhash.txt'
 $RenameAdministratorFile = 'c:\psscripts\renameadministrator.txt'
