@@ -4,6 +4,11 @@
     https://www.mssqltips.com/sqlservertip/2850/querying-sql-server-agent-job-history-data/
     http://sqlrepository.co.uk/code-snippets/sql-dba-code-snippets/script-to-finds-failed-sql-server-agent-jobs/   .Link     Http://toolmaker.brycoretechnologies.com #>
 
+[CmdletBinding()]
+ Param (
+    $ComputerName = $env:COMPUTERNAME
+    
+ )
 
 function Get-QueryResults {
 
@@ -138,7 +143,7 @@ function Get-QueryResults {
                                 and msdb.dbo.agent_datetime(run_date, run_time) 
                                 BETWEEN @Date1 and @Date2 "    "Running SQL Agent Jobs" = "SELECT SYSJOBS.Name, SYSJOBS.Job_Id, SYSPROCESSES.HostName, SYSPROCESSES.LogiName, * 
                                FROM MSDB.dbo.SYSJOBS JOIN MASTER.dbo.SYSPROCESSES
-                               ON SUBSTRING(SYSPROCESSES.PROGRAM_NAME,30,34) = MASTER.dbo.fn_varbintohexstr ( SYSJOBS.job_id) "}if ($ComputerName -eq $null) {    $ComputerName = $env:COMPUTERNAME}$checklistparams = @{    'ComputerName' = $ComputerName    'Class' = 'SqlServiceAdvancedProperty'    'ErrorAction' = 'SilentlyContinue'}if ($FS_Credential) {
+                               ON SUBSTRING(SYSPROCESSES.PROGRAM_NAME,30,34) = MASTER.dbo.fn_varbintohexstr ( SYSJOBS.job_id) "}$checklistparams = @{    'ComputerName' = $ComputerName    'Class' = 'SqlServiceAdvancedProperty'    'ErrorAction' = 'SilentlyContinue'}if ($FS_Credential) {
 
     $checklistparams.Credential = $FS_Credential
 }# Get the sqlservices running on the computer by querying wmi namespace of SQL Server. This works with SQL Server 2005 and greater$sqlwminamespace = @('ComputerManagement', 'ComputerManagement10', 'ComputerManagement11', 'ComputerManagement12')$installedinstance = @()if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) { #try {foreach ($namespace in $sqlwminamespace) {    $getinstance = Get-WmiObject @checklistparams -Namespace "root\Microsoft\SqlServer\$namespace"    if ($getinstance) {        $installedinstance += $getinstance | Where-Object {$_.PropertyName -eq 'VERSION'} | Select-Object ServiceName, PropertyName, PropertyStrValue    }}# Once we have installed SQL Server instances on the server go through them and get the SQL Agent Status#$queryresult = @()$result = @()if ($installedinstance) {    #$installedinstance    foreach ($instance in $installedinstance) {        if ($instance.ServiceName -like '*ReportServer*') {           continue        }        if ($instance.ServiceName -like '*OLAPService*') {           continue        }        if ($instance.ServiceName -like '*ANALYSIS*') {           continue        }        $queryresult = @()        $ServiceName = $instance.ServiceName        if ($ServiceName -eq 'MSSQLSERVER') {            $ConnectionString = "Server=$ComputerName;Integrated Security=SSPI;"        }        else {            # Remove MSSQL$ from the servcie name            $ServiceName = $ServiceName.ToString().Replace('MSSQL$', '')            $ConnectionString = "Server=$ComputerName\$ServiceName;Integrated Security=SSPI;"

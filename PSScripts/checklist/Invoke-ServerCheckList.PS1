@@ -1,5 +1,11 @@
 <#    .Synopsis     Executes a series of WMI commands against a computer   .Description    Executes a series of WMI commands against a computer   .Notes     NAME: Invoke-ServerCheckList.PS1    AUTHOR: Nigel Thomas    LASTEDIT: 2013-03-05      CHECKLISTTYPE: Server   .Link     Http://toolmaker.brycoretechnologies.com #>
 
+[CmdletBinding()]
+ Param (
+    $ComputerName = $env:COMPUTERNAME
+    
+ )
+
 if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) { 
 
 $FS_CheckListResults = [ordered]@{}
