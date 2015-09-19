@@ -85,50 +85,23 @@ if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) {
      if ($disks) {
         foreach ($disk in $disks) {
 
-            <#if ($FreeSpace -ne $null) {
-                
-                if (([Math]::Round($disk.FreeSpace/1GB,0)) -gt $FreeSpace) {
-                    continue
-                }
-            }
-
-            if ($PercentFree -ne $null) {
-                
-                if (([Math]::Round((($disk.FreeSpace/1GB) / ($disk.Size/1GB) * 100),0)) -gt $PercentFree) {
-                    continue
-                }
-            }#>
-
            $diskhash = [ordered]@{
                 "Computer Name" = $ComputerName;
                 "Device ID" = $disk.DeviceID;
                 "Volumn Name" = $disk.VolumeName;
-                "Size (GB)" = ([Math]::Round($disk.Size/1GB,0));
-                "Used Space (GB)"=  ([Math]::Round($disk.Size/1GB - $disk.FreeSpace/1GB,0));
-                "Free Space (GB)" = ([Math]::Round($disk.FreeSpace/1GB,0));
-                "Percent Free (%)" = ([Math]::Round((($disk.FreeSpace/1GB) / ($disk.Size/1GB) * 100),0))
+                "Size (GB)" = ([Math]::Round($disk.Size/1GB,2));
+                "Used Space (GB)"=  ([Math]::Round($disk.Size/1GB - $disk.FreeSpace/1GB,2));
+                "Free Space (GB)" = ([Math]::Round($disk.FreeSpace/1GB,2));
+                "Percent Free (%)" = ([Math]::Round((($disk.FreeSpace/1GB) / ($disk.Size/1GB) * 100),2))
            }
 
            $objdisk = New-Object -TypeName PSObject -Property $diskhash
            
-           <#$objdisk = New-Object System.Management.Automation.PSObject
-           $objdisk | add-member NoteProperty "Computer Name" -value $ComputerName | Out-Null
-           $objdisk | add-member NoteProperty "Device ID" -value $disk.DeviceID | Out-Null
-           $objdisk | add-member NoteProperty "Volumn Name" -value $disk.VolumeName | Out-Null
-           $objdisk | add-member NoteProperty "Size (GB)" -value ([Math]::Round($disk.Size/1GB,0)) | Out-Null
-           $objdisk | add-Member NoteProperty "Used Space (GB)" ([Math]::Round($disk.Size/1GB - $disk.FreeSpace/1GB,0) ) | Out-Null
-           $objdisk | add-member NoteProperty "Free Space (GB)" -value ([Math]::Round($disk.FreeSpace/1GB,0)) | Out-Null
-           $objdisk | add-member NoteProperty "Percent Free (%)" -value ([Math]::Round((($disk.FreeSpace/1GB) / ($disk.Size/1GB) * 100),0)) | Out-Null #>
-
            $allhdusage.Add($objdisk) | Out-Null
         }
-
-        #Clear-Variable disks
         
         # Output the disk inforamtion
         $allhdusage
-
-        #$allhdusage.Clear()
 
      }
 
