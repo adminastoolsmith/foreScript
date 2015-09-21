@@ -395,7 +395,7 @@ namespace LOGIN_IMPERSONATION
             $ErrorMessage = $DHCPServerNameOrIP + " is offline"
             $jsonresult = '{'
             $jsonresult += " 'Error' :"
-            $jsonresult += $ErrorMessage | ConvertTo-Json
+            $jsonresult += $ErrorMessage | ConvertTo-Json -Compress
             $jsonresult += '}'
             $jsonresult | Out-String
             return
@@ -430,7 +430,7 @@ namespace LOGIN_IMPERSONATION
             $ErrorMessage = "DHCP Error: " + $DHCPresult
             $jsonresult = '{'
             $jsonresult += " 'Error' :"
-            $jsonresult += $ErrorMessage | ConvertTo-Json
+            $jsonresult += $ErrorMessage | ConvertTo-Json -Compress
             $jsonresult += '}'
             $jsonresult | Out-String
             return
@@ -450,7 +450,7 @@ namespace LOGIN_IMPERSONATION
  
         $jsonresult = "{"
         $jsonresult += "'Data':"
-        $jsonresult += $DHCPClientReservations | ConvertTo-Json
+        $jsonresult += $DHCPClientReservations | ConvertTo-Json -Compress
         $jsonresult += "}"
         $jsonresult | Out-String
 
@@ -460,7 +460,7 @@ namespace LOGIN_IMPERSONATION
 
         $jsonresult = '{'
         $jsonresult += " 'Error' :"
-        $jsonresult += $_ | format-list -force | ConvertTo-Json
+        $jsonresult += $_ | format-list -force | ConvertTo-Json -Compress
         $jsonresult += '}'
         $jsonresult | Out-String
     }

@@ -14,6 +14,7 @@
 #
 #------------------------------------------------------------------------------------------
 
+#Requires -version 3
 <#
     .SYNOPSIS        Retrieve SQL Server Agent Job status on local and remote systems.
         .DESCRIPTION        Uses WMI to retrieve hard disk usage information from remote or local machines. Without any paramertes the script will return the hard disk        space usage for all hard disks. You can also specify to return the hard disk space usage for all of the hard disks that have either X percentage
