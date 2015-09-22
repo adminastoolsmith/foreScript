@@ -1,9 +1,9 @@
 ﻿# -----------------------------------------------------------------------------------------
-# Script: Get-SQLJobStatus.ps1
+# Script: Get-FailedSQLAgentJobs.ps1
 # Author: Nigel Thomas
 # Date: September 19, 2015
 # Version: 1.0
-# Purpose: This script is used to retrive the SQL Server agent job status.
+# Purpose: This script is used to retrive failed SQL Server Agent jobss.
 #
 #
 # Project: foreScript
@@ -16,15 +16,9 @@
 
 #Requires -version 3
 <#
-    .SYNOPSIS        Retrieve SQL Server Agent Job status on local and remote systems.
-        .DESCRIPTION        Uses WMI to retrieve hard disk usage information from remote or local machines. Without any paramertes the script will return the hard disk        space usage for all hard disks. You can also specify to return the hard disk space usage for all of the hard disks that have either X percentage
-        of free space or have X gigabytes of free space.
-
-    .PARAMETER FreeSpace
-        Returns the hard disk with X gigabytes of free space.
-
-    .PARAMETER PercentFree
-        Returns the hard disk with X percentage of free space.
+    .SYNOPSIS        Retrieve failed SQL Server Agent Jobs on local and remote systems.
+        .DESCRIPTION        Uses WMI to find all the SQL Server instances on a local or remote computer and then quereis each SQL Server instance for teh failed
+        SQL Server Agent jobs.
 
     .Link 
         https://toolsmith.brycoretechnologies.com

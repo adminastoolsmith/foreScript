@@ -62,7 +62,7 @@ function HashPassword  {
 
     )
 
-    $hasher = New-Object System.Security.Cryptography.Rfc2898DeriveBytes($PasswordString, [System.Text.Encoding]::Default.GetBytes($SaltValue), 10000)
+    $hasher = New-Object System.Security.Cryptography.Rfc2898DeriveBytes($PasswordString, [System.Text.Encoding]::Default.GetBytes($SaltValue), 24000)
     return [System.Convert]::ToBase64String($hasher.GetBytes(16))
 }
 
