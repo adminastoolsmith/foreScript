@@ -458,6 +458,7 @@ function Execute-AsyncRunspaces {
 
                 [Collections.Arraylist]$RunspaceThreads += New-Object PSObject -Property @{                    Computer = $Computer;                    PSInstance = $powershell;                    PSHandle = $powershell.BeginInvoke();
                 }
+
             }
         }
         catch {
@@ -467,7 +468,7 @@ function Execute-AsyncRunspaces {
 
     END {
 
-        try {            while ($RunspaceThreads) {                  foreach ($RunspaceThread in $RunspaceThreads.ToArray()) {                    if ($RunspaceThread.PSHandle.IsCompleted) {                        $rsDataTransfer.RunspaceOutPut += $RunspaceThread.PSInstance.EndInvoke($RunspaceThread.PSHandle)                        $RunspaceThread.PSInstance.Dispose()                        $RunspaceThreads.Remove($RunspaceThread)                    }                                    }            }
+        try {            while ($RunspaceThreads) {                  foreach ($RunspaceThread in $RunspaceThreads.ToArray()) {                                        if ($RunspaceThread.PSHandle.IsCompleted) {                        $rsDataTransfer.RunspaceOutPut += $RunspaceThread.PSInstance.EndInvoke($RunspaceThread.PSHandle)                        $RunspaceThread.PSInstance.Dispose()                        $RunspaceThreads.Remove($RunspaceThread)                    }                    <#if($rsDataTransfer.CancelScript) {                        break                    }                    [System.Windows.Forms.Application]::DoEvents()#>                }                #[System.Windows.Forms.Application]::DoEvents()                <#if($rsDataTransfer.CancelScript) {                    foreach ($RunspaceThread in $RunspaceThreads.ToArray()) {                        $RunspaceThread.PSInstance.Dispose()                        $RunspaceThreads.Remove($RunspaceThread)                    }                    $CancelMessage = "Script Cancelled by User Request `r`n"                    $CancelMessage                }#>            }
 
             $RunspacePool.Close()
         }

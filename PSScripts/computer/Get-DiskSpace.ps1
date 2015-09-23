@@ -19,6 +19,9 @@
         .DESCRIPTION        Uses WMI to retrieve hard disk usage information from remote or local machines. Without any paramertes the script will return the hard disk        space usage for all hard disks. You can also specify to return the hard disk space usage for all of the hard disks that have either X percentage
         of free space or have X gigabytes of free space.
 
+    .PARAMETER ComputerName
+        Returns the hard disk space usage for all hard disks.
+
     .PARAMETER FreeSpace
         Returns the hard disk with X gigabytes of free space.
 

@@ -13,6 +13,29 @@
 #
 #------------------------------------------------------------------------------------------
 
+<#
+    .SYNOPSIS        Queries a local or remote desktop computer for an installed application.
+        .DESCRIPTION        Uses the System Management Classes to check if an application is installed on a local or remote desktop computer. The System
+        Management Classes is used instead of the WMI Win32_Product Class, because the Win32_Product Class is ging to enumerate
+        all of the applications installed on the computer and run the reconfigure option on each installed application. This can potential
+        affect the installation of application and slows down the retreival of the application information.
+
+    .PARAMETER GUID
+        The installed Product GUID.
+
+    .PARAMETER Name
+        The installed Product name.
+
+    .PARAMETER Version
+        The installed Product version.
+
+    .Example
+        Get-InstalledProduct.ps1 -GUID {109A5A16-E09E-4B82-A784-D1780F1190D6} -Name Windows Firewall Configuration Provider -Version 1.2.3412.0
+
+    .Link 
+        https://toolsmith.brycoretechnologies.com
+#>
+
 #Requires -version 3
 
 [CmdletBinding()]
@@ -21,15 +44,15 @@
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    $ProductGUID,
+    [string]$GUID,
     
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    $ProductName,
+    [string]$Name,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    $ProductVersion
+    [string]$Version
     
  )
 
@@ -75,7 +98,7 @@ if (Test-Connection -Computer $ComputerName -Count 1 -BufferSize 16 -Quiet ) {
             $networkCred = $cred.GetNetworkCredential()
             $connoptions.Username=$networkCred.Domain.ToString() + "\" + $networkCred.UserName.ToString()            $connoptions.Password=$networkCred.Password
         }
-                $connoptions.Authentication=[System.Management.AuthenticationLevel]::PacketPrivacy        #$co.EnablePrivileges=$true        $scope = New-Object System.Management.ManagementScope("\\$ComputerName\root\cimv2", $connoptions)        $scope.Connect()        #$objoptions = New-Object System.Management.ObjectGetOptions        # Win32_Product management objects can be accessed in the format of         # Win32_Product.IdentifyingNumber="",Name="",version=""        #$objPath = "Win32_Product.IdentifyingNumber=`"`{109A5A16-E09E-4B82-A784-D1780F1190D6`}`",Name=`"Windows Firewall Configuration Provider`",version=`"1.2.3412.0`""        $objPath = "Win32_Product.IdentifyingNumber=`"$ProductGUID`",Name=`"$ProductName`",version=`"$ProductVersion`""        #$objPath        $path = New-Object System.Management.ManagementPath($objPath)        $InstalledProduct = New-Object System.Management.ManagementObject($scope, $path, $null)
+                $connoptions.Authentication=[System.Management.AuthenticationLevel]::PacketPrivacy        #$co.EnablePrivileges=$true        $scope = New-Object System.Management.ManagementScope("\\$ComputerName\root\cimv2", $connoptions)        $scope.Connect()        #$objoptions = New-Object System.Management.ObjectGetOptions        # Win32_Product management objects can be accessed in the format of         # Win32_Product.IdentifyingNumber="",Name="",version=""        #$objPath = "Win32_Product.IdentifyingNumber=`"`{109A5A16-E09E-4B82-A784-D1780F1190D6`}`",Name=`"Windows Firewall Configuration Provider`",version=`"1.2.3412.0`""        $objPath = "Win32_Product.IdentifyingNumber=`"$GUID`",Name=`"$Name`",version=`"$Version`""        #$objPath        $path = New-Object System.Management.ManagementPath($objPath)        $InstalledProduct = New-Object System.Management.ManagementObject($scope, $path, $null)
 
         #$InstalledProduct
 

@@ -145,11 +145,11 @@
                 <Button  Name="CancelButton" Content="Cancel" Height="25" Width="100" Margin="10,0,10,0" IsCancel="True" />
                 <Button  Name="DoWOLButton" Content="Wake On LAN" Height="25" Width="100" Margin="10,0,10,0"/>
                 <Button  Name="CancelScriptButton" Content="Cancel Script" IsEnabled="False" Height="25" Width="100" Margin="10,0,10,0"/>
+                <Button  Name="GetHelpButton" Content="Get Help" Height="25" Width="100" Margin="10,0,10,0"/>
                 <Button  Name="BatchScriptButton" Content="Batch Script" Height="25" Width="100" Margin="10,0,10,0" />
                 <Button  Name="RunScriptButton" Content="Run Script" Height="25" Width="100" Margin="10,0,10,0" IsDefault="True"/>
                 <Button  Name="InvokeJSCallBackButton" Content="" IsEnabled="False" Height="25" Width="100" Margin="10,0,10,0" />
             </StackPanel>
-            <CheckBox Grid.Column="0" Name="CombineResultsCheckbox" Content="Combine output of the script into one report" IsEnabled="False" Height="25" Margin="10,0,10,0" IsChecked="True"/>
         </Grid>
     </Grid>
 </Window>
