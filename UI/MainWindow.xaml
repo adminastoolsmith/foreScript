@@ -144,7 +144,7 @@
             <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="10,10,10,10" >
                 <Button  Name="CancelButton" Content="Cancel" Height="25" Width="100" Margin="10,0,10,0" IsCancel="True" />
                 <Button  Name="DoWOLButton" Content="Wake On LAN" Height="25" Width="100" Margin="10,0,10,0"/>
-                <Button  Name="CancelScriptButton" Content="Cancel Script" IsEnabled="False" Height="25" Width="100" Margin="10,0,10,0"/>
+                <Button  Name="CancelScriptButton" Content="Cancel Script"  Height="25" Width="100" Margin="10,0,10,0"/>
                 <Button  Name="GetHelpButton" Content="Get Help" Height="25" Width="100" Margin="10,0,10,0"/>
                 <Button  Name="BatchScriptButton" Content="Batch Script" Height="25" Width="100" Margin="10,0,10,0" />
                 <Button  Name="RunScriptButton" Content="Run Script" Height="25" Width="100" Margin="10,0,10,0" IsDefault="True"/>

@@ -65,6 +65,7 @@ $HelperFunctions = {
 
 }
 
+
 $DoImpersonation = {
 
         $Login_Impersonation = @'
@@ -402,6 +403,7 @@ function Execute-AsyncRunspaces {
             #$CredentialParamBlock
 
             $ScriptBlock = [ScriptBlock]::Create($InputScriptBlock)            if (($PSBoundParameters.ContainsKey('UserName')) -and ($PSBoundParameters.ContainsKey('Password'))) {                                if ($AuthenticationType -eq 'credential') {                    $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($CredentialParamBlock + "`r`n" + $DoCredential.ToString() + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())                }                if ($AuthenticationType -eq 'impersonation'){                    $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($CredentialParamBlock + "`r`n" + $DoImpersonation.ToString() + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())                }                if ($AuthenticationType -eq 'combined'){                    $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($CredentialParamBlock + "`r`n" + $DoImpersonation.ToString() + "`r`n" + $DoCredential.ToString() + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())                }            }            else {                $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($DefaultParamBlock + "`r`n" + $HelperFunctions.ToString() + "`r`n" + $ScriptBlock.ToString())
+                
             }
 
             #$ScriptBlock
@@ -428,6 +430,7 @@ function Execute-AsyncRunspaces {
         try {
 
             foreach ($ComputerName in $InputObject) {
+
 
                 if ($ComputerName -eq $null) {
                     continue
@@ -459,6 +462,8 @@ function Execute-AsyncRunspaces {
                 [Collections.Arraylist]$RunspaceThreads += New-Object PSObject -Property @{                    Computer = $Computer;                    PSInstance = $powershell;                    PSHandle = $powershell.BeginInvoke();
                 }
 
+                if ($rsDataTransfer.CancelScript -eq $true) {                        break                }                #[System.Windows.Forms.Application]::DoEvents()
+
             }
         }
         catch {
@@ -468,7 +473,8 @@ function Execute-AsyncRunspaces {
 
     END {
 
-        try {            while ($RunspaceThreads) {                  foreach ($RunspaceThread in $RunspaceThreads.ToArray()) {                                        if ($RunspaceThread.PSHandle.IsCompleted) {                        $rsDataTransfer.RunspaceOutPut += $RunspaceThread.PSInstance.EndInvoke($RunspaceThread.PSHandle)                        $RunspaceThread.PSInstance.Dispose()                        $RunspaceThreads.Remove($RunspaceThread)                    }                    <#if($rsDataTransfer.CancelScript) {                        break                    }                    [System.Windows.Forms.Application]::DoEvents()#>                }                #[System.Windows.Forms.Application]::DoEvents()                <#if($rsDataTransfer.CancelScript) {                    foreach ($RunspaceThread in $RunspaceThreads.ToArray()) {                        $RunspaceThread.PSInstance.Dispose()                        $RunspaceThreads.Remove($RunspaceThread)                    }                    $CancelMessage = "Script Cancelled by User Request `r`n"                    $CancelMessage                }#>            }
+        try {            #[System.Windows.Forms.Application]::DoEvents()            if ($rsDataTransfer.CancelScript -eq $true) {                foreach ($RunspaceThread in $RunspaceThreads.ToArray()) {                    $RunspaceThread.PSInstance.Stop()                    $RunspaceThread.PSInstance.Dispose()                    $RunspaceThreads.Remove($RunspaceThread)                }                    $CancelMessage = "Script Cancelled by User Request `r`n"                    $CancelMessage             }            while ($RunspaceThreads) {                  foreach ($RunspaceThread in $RunspaceThreads.ToArray()) {                    if ($RunspaceThread.PSHandle.IsCompleted) {                        $rsDataTransfer.RunspaceOutPut += $RunspaceThread.PSInstance.EndInvoke($RunspaceThread.PSHandle)                        $RunspaceThread.PSInstance.Dispose()                        $RunspaceThreads.Remove($RunspaceThread)                    }                    if ($rsDataTransfer.CancelScript -eq $true) {                        break                                            }                    [System.Windows.Forms.Application]::DoEvents()                }                [System.Windows.Forms.Application]::DoEvents()                if($rsDataTransfer.CancelScript -eq $true) {                    foreach ($RunspaceThread in $RunspaceThreads.ToArray()) {                        $RunspaceThread.PSInstance.Stop()                        $RunspaceThread.PSInstance.Dispose()                        $RunspaceThreads.Remove($RunspaceThread)                    }                    $CancelMessage = "Script Cancelled by User Request `r`n"                    $CancelMessage                }            }
+
 
             $RunspacePool.Close()
         }
