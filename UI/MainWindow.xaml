@@ -37,10 +37,10 @@
                 </Grid.ColumnDefinitions>
                 <GroupBox Grid.Row="0" Grid.Column="0" Margin="10,5,10,0">
                     <GroupBox.Header>
-                        <RadioButton Name="ImportFromFileRadioButton" Content="Provide the name or ip address of a computer or import computers from File :" GroupName="Import" IsChecked="True"/>
+                        <RadioButton Name="ImportFromFileRadioButton" Content="Provide the name or ip address of computers separated by a comma or import computers from File :" GroupName="Import" IsChecked="True"/>
                     </GroupBox.Header>
                     <StackPanel HorizontalAlignment="Stretch"  Orientation="Horizontal" IsEnabled="{Binding ElementName=ImportFromFileRadioButton, Path=IsChecked}" >
-                        <TextBox Name="SelectFileTextBox" Height="25" Width="550" Margin="10,0,10,0"/>
+                        <TextBox Name="SelectFileTextBox" Height="25" Width="600" Margin="10,0,10,0"/>
                         <Button Name="SelectFileButton" Content="Select File ..."  Height="25" Width="100" Margin="10,10,10,10"/>
                     </StackPanel>
                 </GroupBox>
