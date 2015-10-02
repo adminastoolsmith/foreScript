@@ -1,4 +1,19 @@
-﻿<#
+﻿# -----------------------------------------------------------------------------------------
+# Script: Invoke-RemoteWOL.ps1
+# Author: Nigel Thomas
+# Date: April 24, 2015
+# Version: 1.0
+# Purpose: This script is used to do WOL
+#
+# Project: foreScript
+#
+# -----------------------------------------------------------------------------------------
+#
+# (C) Nigel Thomas, 2015
+#
+#------------------------------------------------------------------------------------------
+
+<#
 .SYNOPSIS
    Passes the Mac Addresses obtained from a DHCP server to a remote computer in an ip subnet that executes WOL
    for each MAX address in the list of Mac Addresses
@@ -8,7 +23,7 @@
   the Invoke-WOL script creates a WOL packet based on the MAC Addresses and broacats each packet on the ip subnet.
   
 .PARAMETER InputObject
-   A custome PSObject that has the details of the DHCP client leases
+   A custom PSObject that has the details of the DHCP client leases
 .PARAMETER Computer
   The remote computer that sends out the WOL packets
 .PARAMETER UserName

@@ -13,6 +13,31 @@
 #
 #------------------------------------------------------------------------------------------
 
+<#
+.SYNOPSIS
+   Returns the DHCP Leases for a subnet from a Windows DHCP Server
+.DESCRIPTION
+  Accepts the name or ip address of a Windows DHCP Server and returns the leases for the specified subnet. The API DhcpEnumSubnetClients is
+  used to query the Windows DHCP server and return the requesred information. If a user name and password is provided the script
+  will use impersonation to connect to the DHCP Server. The leasese
+  are returned as a JSON object.
+  
+.PARAMETER DHCPServerNameOrIP
+   The name or ip address of the DHCP Server
+.PARAMETER Subnet
+  The DHCP subnet that we want to get the leases from
+.PARAMETER UserName
+  The user name
+.PARAMETER Password
+  The password
+
+.NOTES
+  Author: Nigel Thomas
+  Date: 5/18/2015
+  Version: 1.0
+   
+#>
+
 #region functions
 # Based on http://poshcode.org/1477
 #Function Get-DHCPClientLeases {

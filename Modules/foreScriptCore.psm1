@@ -3,7 +3,7 @@
 # Author: Nigel Thomas
 # Date: April 24, 2015
 # Version: 1.0
-# Purpose: This module contains the functions that are used to by foreScript
+# Purpose: This module contains the functions that are used to update the  foreScript UI
 #
 # Project: foreScript
 #

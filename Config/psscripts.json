@@ -28,6 +28,16 @@
               "callback" : "", 
               "warn" : "false"},
 
+            { "name": "Shutdown Computer", 
+              "author": "Nigel Thomas", 
+              "description": "This script is used to shutdown computers", 
+              "folder": "computer",               
+              "file": "Invoke-ShutdownComputer.ps1", 
+              "authtype": "credential", 
+              "template": "FSWOL.tpl", 
+              "callback" : "", 
+              "warn" : "true" },
+
             { "name": "Server Checklist", 
               "author": "Nigel Thomas", "description": "This script is used to automate daily checks of servers.", 
              "folder": "checklist",              
