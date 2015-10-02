@@ -26,6 +26,6 @@ forScript supports:
 3. The ability to run Powershell scripts in batches using a CSV file as input
 4. Dispalying the results of the Powershell script as an HTML report
 
-Further reading
+### Further reading
 
 [Getting Started with foreScript](http://toolsmith.brycoretechnologies.com/2015/10/getting-started-with-forescript.html#more)
