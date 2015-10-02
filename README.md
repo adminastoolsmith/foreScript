@@ -1,4 +1,4 @@
-foreScript is a GUI tool that is used to execute Powershell scripts.
+H1 foreScript is a GUI tool that is used to execute Powershell scripts.
 
 In every Powershell script the creator of the script has to write code to get a set of computer objects, write the actual code that executes against the computer objects, and finally write the code that displays the results of the execution of the code.
 
