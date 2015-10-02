@@ -18,7 +18,11 @@ foreScript is still evolving and I would like to get feed back on how it can be 
 
 forScript supports:
 
-1) The ability to import computer objects via a file of DHCP server
-2) WOL - This works by retrieving MAC addresses from a DHCP server and send out WOL packets for each MAC address
-3) The ability to run Powershell scripts in batches using a CSV file as input
-4) Dispalying the results of the Powershell script as an HTML report
+1. The ability to import computer objects via a file of DHCP server
+2. WOL - This works by retrieving MAC addresses from a DHCP server and send out WOL packets for each MAC address
+3. The ability to run Powershell scripts in batches using a CSV file as input
+4. Dispalying the results of the Powershell script as an HTML report
+
+Further reading
+
+[Getting Started with foreScript](http://toolsmith.brycoretechnologies.com/2015/10/getting-started-with-forescript.html#more)
