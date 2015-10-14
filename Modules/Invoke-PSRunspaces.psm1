@@ -65,7 +65,7 @@ $HelperFunctions = {
 
 }
 
-
+# Based on http://stackoverflow.com/questions/757857/how-to-build-runas-netonly-functionality-into-a-c-net-winforms-program
 $DoImpersonation = {
 
         $Login_Impersonation = @'

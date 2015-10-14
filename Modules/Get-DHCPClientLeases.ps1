@@ -55,6 +55,7 @@
     )
 
     #region PInvoke API definitions
+    # Based on http://stackoverflow.com/questions/757857/how-to-build-runas-netonly-functionality-into-a-c-net-winforms-program
     $Login_Impersonation = @'
 namespace LOGIN_IMPERSONATION
 {
