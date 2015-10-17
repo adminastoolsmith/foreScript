@@ -11,7 +11,8 @@
         <ContextMenu x:Key="TabitemContextMenu">
             <MenuItem Header="Close Tab" Name="CloseTabMenu"/>
             <MenuItem Header="Close All Tabs" Name="CloseAllTabsMenu"/>
-            <MenuItem Header="Save" Name="SaveTabContentsMenu"/>
+            <MenuItem Header="Save As..." Name="SaveTabContentsMenu"/>
+            <MenuItem Header="Save All" Name="SaveAllTabContentsMenu"/>
         </ContextMenu>
         <ContextMenu x:Key="DHCPContextMenu">
             <MenuItem Header="Close Tab" Name="DHCPCloseTabMenu"/>
